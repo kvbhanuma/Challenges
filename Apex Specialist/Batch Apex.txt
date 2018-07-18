@@ -1,0 +1,40 @@
+global class LeadProcessor implements Database.Batchable <SObject> {
+//START METHOD
+    global Database.QueryLocator start(Database.BatchableContext bc){
+        String Query='Select id,LeadSource from Lead';
+        return Database.getQueryLocator(Query);
+            }
+//EXECUTE METHOD
+    global void execute(Database.BatchableContext bc, List<Lead> scope){
+        for(Lead l: scope){
+            l.LeadSource='DreamForce';
+        }
+        update scope;
+    }
+//FINISH METHOD
+    global void finish(Database.BatchableContext bc){
+        Id job= bc.getJobId();
+        System.debug(job);
+    }
+}
+
+
+@istest
+private class LeadProcessorTest {
+    @istest
+    static void tetslead(){
+        List<Lead> l= new List<Lead>();
+        lead l1= new Lead();
+        l1.LastName='surya';
+        l1.Company='Company';
+        l1.Status='Closed-Converted';
+        l1.LeadSource='Dreamforce';
+        l.add(l1);
+        insert l;
+   
+    Test.startTest();
+    LeadProcessor lp= new LeadProcessor();
+    Id jobid= Database.executeBatch(lp);
+    Test.stopTest();
+    }
+}
